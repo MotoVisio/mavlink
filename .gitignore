@@ -19,6 +19,7 @@ pymavlink/dialects/
 pymavlink/MANIFEST
 pymavlink/dist
 pymavlink.egg-info/
+pymavlink
 .pydevproject
 .project
 .ropeproject
@@ -28,3 +29,4 @@ include/
 *.pyc
 include/mavlink/v1.0
 .idea
+cmake-build*

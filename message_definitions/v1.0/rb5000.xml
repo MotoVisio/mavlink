@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<mavlink>
+
+    <include>development.xml</include>
+
+    <dialect>8</dialect>
+
+    <enums>
+        <!-- Enums are defined here (optional) -->
+    </enums>
+
+    <!-- Dialects can use 180-229 for custom messages -->
+    <messages>
+        <message id="187" name="CURRENT_DEPTH">
+            <description>Publish Current Depth in uuv application</description>
+            <field type="uint64_t" name="timestamp" units="us">Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.</field>
+            <field type="float" name="current_depth"> current depth reading </field>
+        </message>
+    </messages>
+
+</mavlink>
