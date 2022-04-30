@@ -1,0 +1,61 @@
+#ifndef @ALLCAPS@_HPP
+#define @ALLCAPS@_HPP
+
+#include <uORB/topics/@SnakeCase@.h>
+
+class MavlinkStream@CamerlCase@ : public MavlinkStream
+{
+public:
+    const char *get_name() const
+    {
+        return MavlinkStream@CamerlCase@::get_name_static();
+    }
+    static const char *get_name_static()
+    {
+        return "@ALLCAPS@";
+    }
+    static uint16_t get_id_static()
+    {
+        return MAVLINK_MSG_ID_@ALLCAPS@;
+    }
+    uint16_t get_id()
+    {
+        return get_id_static();
+    }
+    static MavlinkStream *new_instance(Mavlink *mavlink)
+    {
+        return new MavlinkStream@CamerlCase@(mavlink);
+    }
+    unsigned get_size()
+    {
+        return MAVLINK_MSG_ID_@ALLCAPS@_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES;
+    }
+
+private:
+    uORB::Subscription @SnakeCase@_sub{ORB_ID(@SnakeCase@)};
+
+    /* do not allow top copying this class */
+    MavlinkStream@CamerlCase@(MavlinkStream@CamerlCase@ &);
+    MavlinkStream@CamerlCase@& operator = (const MavlinkStream@CamerlCase@ &);
+
+protected:
+    explicit MavlinkStream@CamerlCase@(Mavlink *mavlink) : MavlinkStream(mavlink)
+    {}
+
+    bool send() override
+    {
+        struct @SnakeCase@_s _@SnakeCase@;    //make sure @SnakeCase@_s is the definition of your uORB topic
+
+        if (@SnakeCase@_sub.update(&_@SnakeCase@)) {
+            mavlink_@SnakeCase@_t _msg_@SnakeCase@;  //make sure mavlink_@SnakeCase@_t is the definition of your custom MAVLink message
+
+            @MESSAGE_INSERT_HERE@
+
+            mavlink_msg_@SnakeCase@_send_struct(_mavlink->get_channel(), &_msg_@SnakeCase@);
+
+            return true;
+        }
+
+        return false;
+    }
+};
