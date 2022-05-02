@@ -30,3 +30,4 @@ include/
 include/mavlink/v1.0
 .idea
 cmake-build*
+generate_templates/*.hpp
