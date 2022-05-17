@@ -34,7 +34,7 @@ class create_streams(name_variations):
                 line = line.strip()
                 if not line == "" and not "=" in line:
                     field_type, field_name = line.split(" ")[0].strip(), line.split(" ")[1].strip()
-                    self.header_line_lst.append(f"\t\t\t_msg_{self.snake_case}.{field_name} = _{self.snake_case}.{field_name};")
+                    self.header_line_lst.append(f"\t\t\t_msg_{self.snake_case}.{field_name} = _{self.snake_case}.{field_name};\n")
 
 
 
