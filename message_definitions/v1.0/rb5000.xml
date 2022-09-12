@@ -18,9 +18,18 @@
         </message>
 
         <message id="188" name="TETHER_INFO">
-            <description>Publish Current Depth in uuv application</description>
-            <field type="float" name="current_released"> current depth reading </field>
+            <description>Publish TETHER_INFO</description>
+            <field type="uint64_t" name="timestamp"> tether_info timestamp reading </field>
+            <field type="uint64_t" name="timestamp_sample"> tether_info timestamp_sample reading </field>
+            <field type="float" name="current_released"> tether_info current_released reading </field>
         </message>
+
+        <message id="189" name="TETHER_COMMAND">
+            <description>Publish TETHER_COMMAND</description>
+            <field type="uint64_t" name="timestamp"> tether_command timestamp reading </field>
+            <field type="float" name="change_reel_length"> tether_command change_reel_length reading </field>
+        </message>
+
     </messages>
 
 </mavlink>
