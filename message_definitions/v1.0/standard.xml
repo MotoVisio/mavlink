@@ -2,7 +2,6 @@
 <mavlink>
   <!-- MAVLink standard messages -->
   <include>minimal.xml</include>
-  <include>rb5000.xml</include>
   <dialect>0</dialect>
   <!-- use minimal.xml enums -->
   <enums/>
