@@ -19,7 +19,6 @@ pymavlink/dialects/
 pymavlink/MANIFEST
 pymavlink/dist
 pymavlink.egg-info/
-pymavlink
 .pydevproject
 .project
 .ropeproject
