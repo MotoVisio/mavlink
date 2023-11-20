@@ -16,7 +16,7 @@ if (NOT ${EXIT_CODE} EQUAL 0)
 endif()
 
 if (NOT MAVLINK_DIALECT)
-    set(MAVLINK_DIALECT common)
+    set(MAVLINK_DIALECT motovisio )
 endif()
 message(STATUS "MAVLink dialect: ${MAVLINK_DIALECT}")
 
