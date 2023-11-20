@@ -142,6 +142,21 @@
         </description>
       </entry>
     </enum>
+    <enum name="MAV_MODE_PROPERTY" bitmask="true">
+      <description>Mode properties.
+      </description>
+      <entry value="1" name="MAV_MODE_PROPERTY_ADVANCED">
+        <description>If set, this mode is an advanced mode.
+          For example a rate-controlled manual mode might be advanced, whereas a position-controlled manual mode is not.
+          A GCS can optionally use this flag to configure the UI for its intended users.
+        </description>
+      </entry>
+      <entry value="2" name="MAV_MODE_PROPERTY_NOT_USER_SELECTABLE">
+        <description>If set, this mode should not be added to the list of selectable modes.
+          The mode might still be selected by the FC directly (for example as part of a failsafe).
+        </description>
+      </entry>
+    </enum>
     <!-- The MAV_CMD enum entries describe either: -->
     <!--  * the data payload of mission items (as used in the MISSION_ITEM_INT message) -->
     <!--  * the data payload of mavlink commands (as used in the COMMAND_INT and COMMAND_LONG messages) -->
@@ -222,14 +237,14 @@
       </entry>
       <entry value="32" name="MAV_BATTERY_STATUS_FLAGS_REQUIRES_SERVICE">
         <description>
-          Battery requires service (not safe to fly). 
+          Battery requires service (not safe to fly).
           This is set at vendor discretion.
           It is likely to be set for most faults, and may also be set according to a maintenance schedule (such as age, or number of recharge cycles, etc.).
         </description>
       </entry>
       <entry value="64" name="MAV_BATTERY_STATUS_FLAGS_BAD_BATTERY">
         <description>
-          Battery is faulty and cannot be repaired (not safe to fly). 
+          Battery is faulty and cannot be repaired (not safe to fly).
           This is set at vendor discretion.
           The battery should be disposed of safely.
         </description>
@@ -383,21 +398,6 @@
       <field type="uint8_t" name="param_type" enum="MAV_PARAM_TYPE">Parameter type.</field>
       <field type="uint8_t" name="param_result" enum="PARAM_ACK">Result code.</field>
     </message>
-    <!-- mission protocol enhancements -->
-    <message id="53" name="MISSION_CHECKSUM">
-      <description>Checksum for the current mission, rally point or geofence plan, or for the "combined" plan (a GCS can use these checksums to determine if it has matching plans).
-        This message must be broadcast with the appropriate checksum following any change to a mission, geofence or rally point definition
-        (immediately after the MISSION_ACK that completes the upload sequence).
-        It may also be requested using MAV_CMD_REQUEST_MESSAGE, where param 2 indicates the plan type for which the checksum is required.
-        The checksum must be calculated on the autopilot, but may also be calculated by the GCS.
-        The checksum uses the same CRC32 algorithm as MAVLink FTP (https://mavlink.io/en/services/ftp.html#crc32-implementation).
-        The checksum for a mission, geofence or rally point definition is run over each item in the plan in seq order (excluding the home location if present in the plan), and covers the following fields (in order):
-        frame, command, autocontinue, param1, param2, param3, param4, param5, param6, param7.
-        The checksum for the whole plan (MAV_MISSION_TYPE_ALL) is calculated using the same approach, running over each sub-plan in the following order: mission, geofence then rally point.
-      </description>
-      <field type="uint8_t" name="mission_type" enum="MAV_MISSION_TYPE">Mission type.</field>
-      <field type="uint32_t" name="checksum">CRC32 checksum of current plan for specified type.</field>
-    </message>
     <message id="295" name="AIRSPEED">
       <description>Airspeed information from a sensor.</description>
       <field type="uint8_t" name="id" instance="true">Sensor ID.</field>
@@ -413,6 +413,27 @@
       <field type="uint8_t" name="signal_quality" units="%">WiFi network signal quality.</field>
       <field type="uint16_t" name="data_rate" units="MiB/s">WiFi network data rate. Set to UINT16_MAX if data_rate information is not supplied.</field>
       <field type="uint8_t" name="security" enum="WIFI_NETWORK_SECURITY">WiFi network security type.</field>
+    </message>
+    <message id="354" name="SET_VELOCITY_LIMITS">
+      <wip/>
+      <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
+      <description>Set temporary maximum limits for horizontal speed, vertical speed and yaw rate.
+        The consumer must stream the current limits in VELOCITY_LIMITS at 1 Hz or more (when limits are being set).
+        The consumer should latch the limits until a new limit is received or the mode is changed.
+      </description>
+      <field type="uint8_t" name="target_system">System ID (0 for broadcast).</field>
+      <field type="uint8_t" name="target_component">Component ID (0 for broadcast).</field>
+      <field type="float" name="horizontal_speed_limit" default="NaN" units="m/s">Limit for horizontal movement in MAV_FRAME_LOCAL_NED. NaN: Field not used (ignore)</field>
+      <field type="float" name="vertical_speed_limit" default="NaN" units="m/s">Limit for vertical movement in MAV_FRAME_LOCAL_NED. NaN: Field not used (ignore)</field>
+      <field type="float" name="yaw_rate_limit" default="NaN" units="rad/s">Limit for vehicle turn rate around its yaw axis. NaN: Field not used (ignore)</field>
+    </message>
+    <message id="355" name="VELOCITY_LIMITS">
+      <wip/>
+      <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
+      <description>Current limits for horizontal speed, vertical speed and yaw rate, as set by SET_VELOCITY_LIMITS.</description>
+      <field type="float" name="horizontal_speed_limit" default="NaN" units="m/s">Limit for horizontal movement in MAV_FRAME_LOCAL_NED. NaN: No limit applied</field>
+      <field type="float" name="vertical_speed_limit" default="NaN" units="m/s">Limit for vertical movement in MAV_FRAME_LOCAL_NED. NaN: No limit applied</field>
+      <field type="float" name="yaw_rate_limit" default="NaN" units="rad/s">Limit for vehicle turn rate around its yaw axis. NaN: No limit applied</field>
     </message>
     <message id="361" name="FIGURE_EIGHT_EXECUTION_STATUS">
       <wip/>
@@ -480,9 +501,9 @@
       <field type="uint8_t" name="number_modes">The total number of available modes for the current vehicle type.</field>
       <field type="uint8_t" name="mode_index">The current mode index within number_modes, indexed from 1.</field>
       <field type="uint8_t" name="standard_mode" enum="MAV_STANDARD_MODE">Standard mode.</field>
-      <field type="uint8_t" name="base_mode" enum="MAV_MODE_FLAG" display="bitmask">System mode bitmap.</field>
       <field type="uint32_t" name="custom_mode">A bitfield for use for autopilot-specific flags</field>
-      <field type="char[50]" name="mode_name">Name of custom mode, with null termination character. Should be omitted for standard modes.</field>
+      <field type="uint32_t" name="properties" enum="MAV_MODE_PROPERTY">Mode properties.</field>
+      <field type="char[35]" name="mode_name">Name of custom mode, with null termination character. Should be omitted for standard modes.</field>
     </message>
     <message id="436" name="CURRENT_MODE">
       <description>Get the current mode.
@@ -490,8 +511,15 @@
         It may be requested using MAV_CMD_REQUEST_MESSAGE.
       </description>
       <field type="uint8_t" name="standard_mode" enum="MAV_STANDARD_MODE">Standard mode.</field>
-      <field type="uint8_t" name="base_mode" enum="MAV_MODE_FLAG" display="bitmask">System mode bitmap.</field>
       <field type="uint32_t" name="custom_mode">A bitfield for use for autopilot-specific flags</field>
+      <field type="uint32_t" name="intended_custom_mode" invalid="0">The custom_mode of the mode that was last commanded by the user (for example, with MAV_CMD_DO_SET_STANDARD_MODE, MAV_CMD_DO_SET_MODE or via RC). This should usually be the same as custom_mode. It will be different if the vehicle is unable to enter the intended mode, or has left that mode due to a failsafe condition. 0 indicates the intended custom mode is unknown/not supplied</field>
+    </message>
+    <message id="437" name="AVAILABLE_MODES_MONITOR">
+      <description>A change to the sequence number indicates that the set of AVAILABLE_MODES has changed.
+        A receiver must re-request all available modes whenever the sequence number changes.
+        This is only emitted after the first change and should then be broadcast at low rate (nominally 0.3 Hz) and on change.
+      </description>
+      <field type="uint8_t" name="seq">Sequence number. The value iterates sequentially whenever AVAILABLE_MODES changes (e.g. support for a new mode is added/removed dynamically).</field>
     </message>
     <!-- Target info from a sensor on the target -->
     <message id="510" name="TARGET_ABSOLUTE">
