@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Config for auto-building
-#git remote rename origin upstream
-#git config --global user.email "bot@pixhawk.org"
-#git config --global user.name "PX4BuildBot"
-#git config --global credential.helper "store --file=$HOME/.git-credentials"
-#echo "https://${GH_TOKEN}:@github.com" > "$HOME"/.git-credentials
+git remote rename origin upstream
+git config --global user.email "bot@pixhawk.org"
+git config --global user.name "PX4BuildBot"
+git config --global credential.helper "store --file=$HOME/.git-credentials"
+echo "https://${GH_TOKEN}:@github.com" > "$HOME"/.git-credentials
 
 # Build C library
 GEN_START_PATH=$PWD
