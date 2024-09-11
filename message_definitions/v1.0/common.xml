@@ -243,7 +243,7 @@
       Some deprecated frames do not follow these conventions (e.g. MAV_FRAME_BODY_NED and MAV_FRAME_BODY_OFFSET_NED).
  </description>
       <entry value="0" name="MAV_FRAME_GLOBAL">
-        <description>Global (WGS84) coordinate frame + MSL altitude. First value / x: latitude, second value / y: longitude, third value / z: positive altitude over mean sea level (MSL).</description>
+        <description>Global (WGS84) coordinate frame + altitude relative to mean sea level (MSL).</description>
       </entry>
       <entry value="1" name="MAV_FRAME_LOCAL_NED">
         <description>NED local tangent frame (x: North, y: East, z: Down) with origin fixed relative to earth.</description>
@@ -254,20 +254,18 @@
       <entry value="3" name="MAV_FRAME_GLOBAL_RELATIVE_ALT">
         <description>
           Global (WGS84) coordinate frame + altitude relative to the home position.
-          First value / x: latitude, second value / y: longitude, third value / z: positive altitude with 0 being at the altitude of the home position.
         </description>
       </entry>
       <entry value="4" name="MAV_FRAME_LOCAL_ENU">
         <description>ENU local tangent frame (x: East, y: North, z: Up) with origin fixed relative to earth.</description>
       </entry>
       <entry value="5" name="MAV_FRAME_GLOBAL_INT">
-        <description>Global (WGS84) coordinate frame (scaled) + MSL altitude. First value / x: latitude in degrees*1E7, second value / y: longitude in degrees*1E7, third value / z: positive altitude over mean sea level (MSL).</description>
+        <deprecated since="2024-03" replaced_by="MAV_FRAME_GLOBAL">Use MAV_FRAME_GLOBAL in COMMAND_INT (and elsewhere) as a synonymous replacement.</deprecated>
+        <description>Global (WGS84) coordinate frame (scaled) + altitude relative to mean sea level (MSL).</description>
       </entry>
       <entry value="6" name="MAV_FRAME_GLOBAL_RELATIVE_ALT_INT">
-        <description>
-          Global (WGS84) coordinate frame (scaled) + altitude relative to the home position.
-          First value / x: latitude in degrees*1E7, second value / y: longitude in degrees*1E7, third value / z: positive altitude with 0 being at the altitude of the home position.
-        </description>
+        <deprecated since="2024-03" replaced_by="MAV_FRAME_GLOBAL_RELATIVE_ALT">Use MAV_FRAME_GLOBAL_RELATIVE_ALT in COMMAND_INT (and elsewhere) as a synonymous replacement.</deprecated>
+        <description>Global (WGS84) coordinate frame (scaled) + altitude relative to the home position. </description>
       </entry>
       <entry value="7" name="MAV_FRAME_LOCAL_OFFSET_NED">
         <description>NED local tangent frame (x: North, y: East, z: Down) with origin that travels with the vehicle.</description>
@@ -281,10 +279,11 @@
         <description>This is the same as MAV_FRAME_BODY_FRD.</description>
       </entry>
       <entry value="10" name="MAV_FRAME_GLOBAL_TERRAIN_ALT">
-        <description>Global (WGS84) coordinate frame with AGL altitude (at the waypoint coordinate). First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model.</description>
+        <description>Global (WGS84) coordinate frame with AGL altitude (altitude at ground level).</description>
       </entry>
       <entry value="11" name="MAV_FRAME_GLOBAL_TERRAIN_ALT_INT">
-        <description>Global (WGS84) coordinate frame (scaled) with AGL altitude (at the waypoint coordinate). First value / x: latitude in degrees*1E7, second value / y: longitude in degrees*1E7, third value / z: positive altitude in meters with 0 being at ground level in terrain model.</description>
+        <deprecated since="2024-03" replaced_by="MAV_FRAME_GLOBAL_TERRAIN_ALT">Use MAV_FRAME_GLOBAL_TERRAIN_ALT in COMMAND_INT (and elsewhere) as a synonymous replacement.</deprecated>
+        <description>Global (WGS84) coordinate frame (scaled) with AGL altitude (altitude at ground level).</description>
       </entry>
       <entry value="12" name="MAV_FRAME_BODY_FRD">
         <description>FRD local frame aligned to the vehicle's attitude (x: Forward, y: Right, z: Down) with an origin that travels with vehicle.</description>
@@ -397,6 +396,24 @@
       </entry>
       <entry value="2" name="FENCE_MITIGATE_VEL_LIMIT">
         <description>Velocity limiting active to prevent breach</description>
+      </entry>
+    </enum>
+    <!-- enum of fence types to enable or disable as a bitmask -->
+    <enum name="FENCE_TYPE" bitmask="true">
+      <entry value="0" name="FENCE_TYPE_ALL">
+        <description>All fence types</description>
+      </entry>
+      <entry value="1" name="FENCE_TYPE_ALT_MAX">
+        <description>Maximum altitude fence</description>
+      </entry>
+      <entry value="2" name="FENCE_TYPE_CIRCLE">
+        <description>Circle fence</description>
+      </entry>
+      <entry value="4" name="FENCE_TYPE_POLYGON">
+        <description>Polygon fence</description>
+      </entry>
+      <entry value="8" name="FENCE_TYPE_ALT_MIN">
+        <description>Minimum altitude fence</description>
       </entry>
     </enum>
     <!-- Camera Mount mode Enumeration -->
@@ -826,6 +843,9 @@
       <entry value="4" name="ORBIT_YAW_BEHAVIOUR_RC_CONTROLLED">
         <description>Yaw controlled by RC input.</description>
       </entry>
+      <entry value="5" name="ORBIT_YAW_BEHAVIOUR_UNCHANGED">
+        <description>Vehicle uses current yaw behaviour (unchanged). The vehicle-default yaw behaviour is used if this value is specified when orbit is first commanded.</description>
+      </entry>
     </enum>
     <enum name="WIFI_CONFIG_AP_RESPONSE">
       <description>Possible responses from a WIFI_CONFIG_AP message.</description>
@@ -1235,7 +1255,7 @@
         <param index="7" label="Altitude/Z">Center point altitude (MSL) (if no MAV_FRAME specified) / Z coordinate according to MAV_FRAME. NaN: Use current vehicle altitude.</param>
       </entry>
       <entry value="80" name="MAV_CMD_NAV_ROI" hasLocation="true" isDestination="false">
-        <deprecated since="2018-01" replaced_by="MAV_CMD_DO_SET_ROI_*"/>
+        <deprecated since="2018-01" replaced_by="`MAV_CMD_DO_SET_ROI_*`"/>
         <description>Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicle's control system to control the vehicle attitude and the attitude of various sensors such as cameras.</description>
         <param index="1" label="ROI Mode" enum="MAV_ROI">Region of interest mode.</param>
         <param index="2" label="WP Index" minValue="0" increment="1">Waypoint index/ target ID. (see MAV_ROI enum)</param>
@@ -1425,6 +1445,7 @@
         <param index="7" label="Altitude" units="m">Altitude</param>
       </entry>
       <entry value="180" name="MAV_CMD_DO_SET_PARAMETER" hasLocation="false" isDestination="false">
+        <deprecated since="2024-04" replaced_by="PARAM_SET"/>
         <description>Set a system parameter.  Caution!  Use of this command requires knowledge of the numeric enumeration value of the parameter.</description>
         <param index="1" label="Number" minValue="0" increment="1">Parameter number</param>
         <param index="2" label="Value">Parameter value</param>
@@ -1510,6 +1531,27 @@
         <param index="5" label="Actuator 5" minValue="-1" maxValue="1">Actuator 5 value, scaled from [-1 to 1]. NaN to ignore.</param>
         <param index="6" label="Actuator 6" minValue="-1" maxValue="1">Actuator 6 value, scaled from [-1 to 1]. NaN to ignore.</param>
         <param index="7" label="Index" minValue="0" increment="1">Index of actuator set (i.e if set to 1, Actuator 1 becomes Actuator 7)</param>
+      </entry>
+      <entry value="188" name="MAV_CMD_DO_RETURN_PATH_START" hasLocation="true" isDestination="false">
+        <wip/>
+        <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
+        <description>Mission item to specify the start of a failsafe/landing return-path segment (the end of the segment is the next MAV_CMD_DO_LAND_START item).
+          A vehicle that is using missions for landing (e.g. in a return mode) will join the mission on the closest path of the return-path segment (instead of MAV_CMD_DO_LAND_START or the nearest waypoint).
+          The main use case is to minimize the failsafe flight path in corridor missions, where the inbound/outbound paths are constrained (by geofences) to the same particular path.
+          The MAV_CMD_NAV_RETURN_PATH_START would be placed at the start of the return path.
+          If a failsafe occurs on the outbound path the vehicle will move to the nearest point on the return path (which is parallel for this kind of mission), effectively turning round and following the shortest path to landing.
+          If a failsafe occurs on the inbound path the vehicle is already on the return segment and will continue to landing.
+          The Latitude/Longitude/Altitude are optional, and may be set to 0 if not needed.
+          If specified, the item defines the waypoint at which the return segment starts.
+          If sent using as a command, the vehicle will perform a mission landing (using the land segment if defined) or reject the command if mission landings are not supported, or no mission landing is defined. When used as a command any position information in the command is ignored.
+        </description>
+        <param index="1">Empty</param>
+        <param index="2">Empty</param>
+        <param index="3">Empty</param>
+        <param index="4">Empty</param>
+        <param index="5" label="Latitude">Latitudee. 0: not used.</param>
+        <param index="6" label="Longitude">Longitudee. 0: not used.</param>
+        <param index="7" label="Altitude" units="m">Altitudee. 0: not used.</param>
       </entry>
       <entry value="189" name="MAV_CMD_DO_LAND_START" hasLocation="true" isDestination="false">
         <description>Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts.
@@ -1620,7 +1662,7 @@
         <param index="7">Empty</param>
       </entry>
       <entry value="201" name="MAV_CMD_DO_SET_ROI" hasLocation="true" isDestination="false">
-        <deprecated since="2018-01" replaced_by="MAV_CMD_DO_SET_ROI_*"/>
+        <deprecated since="2018-01" replaced_by="`MAV_CMD_DO_SET_ROI_*`"/>
         <description>Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicle's control system to control the vehicle attitude and the attitude of various sensors such as cameras.</description>
         <param index="1" label="ROI Mode" enum="MAV_ROI">Region of interest mode.</param>
         <param index="2" label="WP Index" minValue="0" increment="1">Waypoint index/ target ID (depends on param 1).</param>
@@ -1665,7 +1707,7 @@
       </entry>
       <!-- this one is messed up! altitude should be param 7, not param4 -->
       <entry value="205" name="MAV_CMD_DO_MOUNT_CONTROL" hasLocation="false" isDestination="false">
-        <deprecated since="2020-01" replaced_by="MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW">This message is ambiguous and inconsistent. It has been superseded by MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW and MAV_CMD_DO_SET_ROI_*. The message can still be used to communicate with legacy gimbals implementing it.</deprecated>
+        <deprecated since="2020-01" replaced_by="MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW">This message is ambiguous and inconsistent. It has been superseded by MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW and `MAV_CMD_DO_SET_ROI_*` variants. The message can still be used to communicate with legacy gimbals implementing it.</deprecated>
         <description>Mission command to control a camera or antenna mount</description>
         <param index="1" label="Pitch">pitch depending on mount mode (degrees or degrees/second depending on pitch input).</param>
         <param index="2" label="Roll">roll depending on mount mode (degrees or degrees/second depending on roll input).</param>
@@ -1686,9 +1728,15 @@
         <param index="7">Empty</param>
       </entry>
       <entry value="207" name="MAV_CMD_DO_FENCE_ENABLE" hasLocation="false" isDestination="false">
-        <description>Mission command to enable the geofence</description>
+        <description>
+          Enable the geofence.
+          This can be used in a mission or via the command protocol.
+          The persistence/lifetime of the setting is undefined.
+          Depending on flight stack implementation it may persist until superseded, or it may revert to a system default at the end of a mission.
+          Flight stacks typically reset the setting to system defaults on reboot.
+	</description>
         <param index="1" label="Enable" minValue="0" maxValue="2" increment="1">enable? (0=disable, 1=enable, 2=disable_floor_only)</param>
-        <param index="2">Empty</param>
+        <param index="2" label="Types" enum="FENCE_TYPE">Fence types to enable or disable as a bitmask. A value of 0 indicates that all fences should be enabled or disabled. This parameter is ignored if param 1 has the value 2</param>
         <param index="3">Empty</param>
         <param index="4">Empty</param>
         <param index="5">Empty</param>
@@ -1950,10 +1998,15 @@
         </description>
       </entry>
       <entry value="405" name="MAV_CMD_ILLUMINATOR_ON_OFF" hasLocation="false" isDestination="false">
-        <wip/>
-        <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
         <description>Turns illuminators ON/OFF. An illuminator is a light source that is used for lighting up dark areas external to the system: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).</description>
         <param index="1" label="Enable" minValue="0" maxValue="1" increment="1">0: Illuminators OFF, 1: Illuminators ON</param>
+      </entry>
+      <entry value="406" name="MAV_CMD_DO_ILLUMINATOR_CONFIGURE" hasLocation="false" isDestination="false">
+        <description>Configures illuminator settings. An illuminator is a light source that is used for lighting up dark areas external to the system: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).</description>
+        <param index="1" label="Mode" enum="ILLUMINATOR_MODE">Mode</param>
+        <param index="2" label="Brightness" units="%" minValue="0" maxValue="100">0%: Off, 100%: Max Brightness</param>
+        <param index="3" label="Strobe Period" units="s" minValue="0">Strobe period in seconds where 0 means strobing is not used</param>
+        <param index="4" label="Strobe Duty" units="%" minValue="0" maxValue="100">Strobe duty cycle where 100% means it is on constantly and 0 means strobing is not used</param>
       </entry>
       <entry value="410" name="MAV_CMD_GET_HOME_POSITION" hasLocation="false" isDestination="false">
         <deprecated since="2022-04" replaced_by="MAV_CMD_REQUEST_MESSAGE"/>
@@ -2059,7 +2112,7 @@
       </entry>
       <entry value="530" name="MAV_CMD_SET_CAMERA_MODE" hasLocation="false" isDestination="false">
         <description>Set camera running mode. Use NaN for reserved values. GCS will send a MAV_CMD_REQUEST_VIDEO_STREAM_STATUS command after a mode change if the camera supports video streaming.</description>
-        <param index="1">Reserved (Set to 0)</param>
+        <param index="1" label="id">Target camera ID. 7 to 255: MAVLink camera component id. 1 to 6 for cameras that don't have a distinct component id (such as autopilot-attached cameras). 0: all cameras. This is used to specifically target autopilot-connected cameras or individual sensors in a multi-sensor MAVLink camera. It is also used to target specific cameras when the MAV_CMD is used in a mission</param>
         <param index="2" label="Camera Mode" enum="CAMERA_MODE">Camera mode</param>
         <param index="3" reserved="true" default="NaN"/>
         <param index="4" reserved="true" default="NaN"/>
@@ -2089,6 +2142,12 @@
           A target system can choose to not allow a particular storage to be set as preferred storage, in which case it should ACK the command with MAV_RESULT_DENIED.</description>
         <param index="1" label="Storage ID" minValue="0" increment="1">Storage ID (1 for first, 2 for second, etc.)</param>
         <param index="2" label="Usage" enum="STORAGE_USAGE_FLAG">Usage flags</param>
+      </entry>
+      <entry value="534" name="MAV_CMD_SET_CAMERA_SOURCE" hasLocation="false" isDestination="false">
+        <description>Set camera source. Changes the camera's active sources on cameras with multiple image sensors.</description>
+        <param index="1" label="device id">Component Id of camera to address or 1-6 for non-MAVLink cameras, 0 for all cameras.</param>
+        <param index="2" label="primary source" enum="CAMERA_SOURCE">Primary Source</param>
+        <param index="3" label="secondary source" enum="CAMERA_SOURCE">Secondary Source. If non-zero the second source will be displayed as picture-in-picture.</param>
       </entry>
       <entry value="600" name="MAV_CMD_JUMP_TAG" hasLocation="false" isDestination="false">
         <description>Tagged jump target. Can be jumped to with MAV_CMD_DO_JUMP_TAG.</description>
@@ -2126,7 +2185,7 @@
 
           When used in a mission, an autopilot should execute the MAV_CMD for a specified local camera (param1 = 1-6), or resend it as a command if it is intended for a MAVLink camera (param1 = 7 - 255), setting the command's target_component as the param1 value (and setting param1 in the command to zero).
           If the param1 is 0 the autopilot should do both.
-          
+
           When sent in a command the target MAVLink address is set using target_component.
           If addressed specifically to an autopilot: param1 should be used in the same way as it is for missions (though command should NACK with MAV_RESULT_DENIED if a specified local camera does not exist).
           If addressed to a MAVLink camera, param 1 can be used to address all cameras (0), or to separately address 1 to 7 individual sensors. Other values should be NACKed with MAV_RESULT_DENIED.
@@ -2142,7 +2201,7 @@
       </entry>
       <entry value="2001" name="MAV_CMD_IMAGE_STOP_CAPTURE" hasLocation="false" isDestination="false">
         <description>Stop image capture sequence.
-        
+
           Param1 (id) may be used to specify the target camera: 0: all cameras, 1 to 6: autopilot-connected cameras, 7-255: MAVLink camera component ID.
           It is needed in order to target specific cameras connected to the autopilot, or specific sensors in a multi-sensor camera (neither of which have a distinct MAVLink component ID).
           It is also needed to specify the target camera in missions.
@@ -2184,7 +2243,7 @@
         <description>If the camera supports point visual tracking (CAMERA_CAP_FLAGS_HAS_TRACKING_POINT is set), this command allows to initiate the tracking.</description>
         <param index="1" label="Point x" minValue="0" maxValue="1">Point to track x value (normalized 0..1, 0 is left, 1 is right).</param>
         <param index="2" label="Point y" minValue="0" maxValue="1">Point to track y value (normalized 0..1, 0 is top, 1 is bottom).</param>
-        <param index="3" label="Radius" minValue="0" maxValue="1">Point radius (normalized 0..1, 0 is image left, 1 is image right).</param>
+        <param index="3" label="Radius" minValue="0" maxValue="1">Point radius (normalized 0..1, 0 is one pixel, 1 is full image width).</param>
       </entry>
       <entry value="2005" name="MAV_CMD_CAMERA_TRACK_RECTANGLE" hasLocation="false" isDestination="false">
         <description>If the camera supports rectangle visual tracking (CAMERA_CAP_FLAGS_HAS_TRACKING_RECTANGLE is set), this command allows to initiate the tracking.</description>
@@ -2398,6 +2457,16 @@
         <param index="7">Reserved (set to 0)</param>
       </entry>
       <!-- END of UAVCAN range -->
+      <entry value="5300" name="MAV_CMD_DO_SET_SAFETY_SWITCH_STATE" hasLocation="false" isDestination="false">
+        <description>Change state of safety switch.</description>
+        <param index="1" label="Desired State" enum="SAFETY_SWITCH_STATE">New safety switch state.</param>
+        <param index="2">Empty.</param>
+        <param index="3">Empty.</param>
+        <param index="4">Empty</param>
+        <param index="5">Empty.</param>
+        <param index="6">Empty.</param>
+        <param index="7">Empty.</param>
+      </entry>
       <entry value="10001" name="MAV_CMD_DO_ADSB_OUT_IDENT" hasLocation="false" isDestination="false">
         <description>Trigger the start of an ADSB-out IDENT. This should only be used when requested to do so by an Air Traffic Controller in controlled airspace. This starts the IDENT which is then typically held for 18 seconds by the hardware per the Mode A, C, and S transponder spec.</description>
         <param index="1">Reserved (set to 0)</param>
@@ -2408,6 +2477,7 @@
         <param index="6">Reserved (set to 0)</param>
         <param index="7">Reserved (set to 0)</param>
       </entry>
+      <!-- Entry 12900 reserved for MAV_CMD_ODID_SET_EMERGENCY in development.xml -->
       <!-- VALUES FROM 0-40000 are reserved for the common message set. Values from 40000 to UINT16_MAX are available for dialects -->
       <!-- BEGIN of payload range (30000 to 30999) -->
       <entry value="30001" name="MAV_CMD_PAYLOAD_PREPARE_DEPLOY" hasLocation="true" isDestination="true">
@@ -2662,7 +2732,7 @@
       </entry>
     </enum>
     <enum name="MAV_ROI">
-      <deprecated since="2018-01" replaced_by="MAV_CMD_DO_SET_ROI_*"/>
+      <deprecated since="2018-01" replaced_by="`MAV_CMD_DO_SET_ROI_*`"/>
       <description>The ROI (region of interest) for the vehicle. This can be
                 be used by the vehicle for camera/vehicle attitude alignment (see
                 MAV_CMD_NAV_ROI).</description>
@@ -3758,8 +3828,20 @@
       <entry value="2" name="VIDEO_STREAM_TYPE_TCP_MPEG">
         <description>Stream is MPEG on TCP</description>
       </entry>
-      <entry value="3" name="VIDEO_STREAM_TYPE_MPEG_TS_H264">
-        <description>Stream is h.264 on MPEG TS (URI gives the port number)</description>
+      <entry value="3" name="VIDEO_STREAM_TYPE_MPEG_TS">
+        <description>Stream is MPEG TS (URI gives the port number)</description>
+      </entry>
+    </enum>
+    <enum name="VIDEO_STREAM_ENCODING">
+      <description>Video stream encodings</description>
+      <entry value="0" name="VIDEO_STREAM_ENCODING_UNKNOWN">
+        <description>Stream encoding is unknown</description>
+      </entry>
+      <entry value="1" name="VIDEO_STREAM_ENCODING_H264">
+        <description>Stream encoding is H.264</description>
+      </entry>
+      <entry value="2" name="VIDEO_STREAM_ENCODING_H265">
+        <description>Stream encoding is H.265</description>
       </entry>
     </enum>
     <enum name="CAMERA_TRACKING_STATUS_FLAGS">
@@ -3841,6 +3923,21 @@
       </entry>
       <entry value="6" name="FOCUS_TYPE_AUTO_CONTINUOUS">
         <description>Continuous auto focus. Mainly used for dynamic scenes. Abbreviated as AF-C.</description>
+      </entry>
+    </enum>
+    <enum name="CAMERA_SOURCE">
+      <description>Camera sources for MAV_CMD_SET_CAMERA_SOURCE</description>
+      <entry value="0" name="CAMERA_SOURCE_DEFAULT">
+        <description>Default camera source.</description>
+      </entry>
+      <entry value="1" name="CAMERA_SOURCE_RGB">
+        <description>RGB camera source.</description>
+      </entry>
+      <entry value="2" name="CAMERA_SOURCE_IR">
+        <description>IR camera source.</description>
+      </entry>
+      <entry value="3" name="CAMERA_SOURCE_NDVI">
+        <description>NDVI camera source.</description>
       </entry>
     </enum>
     <enum name="PARAM_ACK">
@@ -4987,6 +5084,41 @@
         <description>Mission has executed all mission items.</description>
       </entry>
     </enum>
+    <enum name="SAFETY_SWITCH_STATE">
+      <description>
+	Possible safety switch states.
+      </description>
+      <entry value="0" name="SAFETY_SWITCH_STATE_SAFE">
+        <description>Safety switch is engaged and vehicle should be safe to approach.</description>
+      </entry>
+      <entry value="1" name="SAFETY_SWITCH_STATE_DANGEROUS">
+        <description>Safety switch is NOT engaged and motors, propellers and other actuators should be considered active.</description>
+      </entry>
+    </enum>
+    <enum name="ILLUMINATOR_MODE">
+      <description>Modes of illuminator</description>
+      <entry value="0" name="ILLUMINATOR_MODE_UNKNOWN">
+        <description>Illuminator mode is not specified/unknown</description>
+      </entry>
+      <entry value="1" name="ILLUMINATOR_MODE_INTERNAL_CONTROL">
+        <description>Illuminator behavior is controlled by MAV_CMD_DO_ILLUMINATOR_CONFIGURE settings</description>
+      </entry>
+      <entry value="2" name="ILLUMINATOR_MODE_EXTERNAL_SYNC">
+        <description>Illuminator behavior is controlled by external factors: e.g. an external hardware signal</description>
+      </entry>
+    </enum>
+    <enum name="ILLUMINATOR_ERROR_FLAGS" bitmask="true">
+      <description>Illuminator module error flags (bitmap, 0 means no error)</description>
+      <entry value="1" name="ILLUMINATOR_ERROR_FLAGS_THERMAL_THROTTLING">
+        <description>Illuminator thermal throttling error.</description>
+      </entry>
+      <entry value="2" name="ILLUMINATOR_ERROR_FLAGS_OVER_TEMPERATURE_SHUTDOWN">
+        <description>Illuminator over temperature shutdown error.</description>
+      </entry>
+      <entry value="4" name="ILLUMINATOR_ERROR_FLAGS_THERMISTOR_FAILURE">
+        <description>Illuminator thermistor failure.</description>
+      </entry>
+    </enum>
   </enums>
   <messages>
     <message id="1" name="SYS_STATUS">
@@ -5102,8 +5234,8 @@
       <field type="int32_t" name="lat" units="degE7">Latitude (WGS84, EGM96 ellipsoid)</field>
       <field type="int32_t" name="lon" units="degE7">Longitude (WGS84, EGM96 ellipsoid)</field>
       <field type="int32_t" name="alt" units="mm">Altitude (MSL). Positive for up. Note that virtually all GPS modules provide the MSL altitude in addition to the WGS84 altitude.</field>
-      <field type="uint16_t" name="eph" invalid="UINT16_MAX">GPS HDOP horizontal dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
-      <field type="uint16_t" name="epv" invalid="UINT16_MAX">GPS VDOP vertical dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
+      <field type="uint16_t" name="eph" invalid="UINT16_MAX" multiplier="1E-2">GPS HDOP horizontal dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
+      <field type="uint16_t" name="epv" invalid="UINT16_MAX" multiplier="1E-2">GPS VDOP vertical dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
       <field type="uint16_t" name="vel" units="cm/s" invalid="UINT16_MAX">GPS ground speed. If unknown, set to: UINT16_MAX</field>
       <field type="uint16_t" name="cog" units="cdeg" invalid="UINT16_MAX">Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX</field>
       <field type="uint8_t" name="satellites_visible" invalid="UINT8_MAX">Number of satellites visible. If unknown, set to UINT8_MAX</field>
@@ -5121,7 +5253,7 @@
       <field type="uint8_t[20]" name="satellite_prn">Global satellite ID</field>
       <field type="uint8_t[20]" name="satellite_used">0: Satellite not used, 1: used for localization</field>
       <field type="uint8_t[20]" name="satellite_elevation" units="deg">Elevation (0: right on top of receiver, 90: on the horizon) of satellite</field>
-      <field type="uint8_t[20]" name="satellite_azimuth" units="deg">Direction of satellite, 0: 0 deg, 255: 360 deg.</field>
+      <field type="uint8_t[20]" name="satellite_azimuth" units="deg" multiplier="360/255">Direction of satellite, 0: 0 deg, 255: 360 deg.</field>
       <field type="uint8_t[20]" name="satellite_snr" units="dB">Signal to noise ratio of satellite</field>
     </message>
     <message id="26" name="SCALED_IMU">
@@ -5212,7 +5344,7 @@
       <field type="int32_t" name="lat" units="degE7">Latitude, expressed</field>
       <field type="int32_t" name="lon" units="degE7">Longitude, expressed</field>
       <field type="int32_t" name="alt" units="mm">Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.</field>
-      <field type="int32_t" name="relative_alt" units="mm">Altitude above ground</field>
+      <field type="int32_t" name="relative_alt" units="mm">Altitude above home</field>
       <field type="int16_t" name="vx" units="cm/s">Ground X Speed (Latitude, positive north)</field>
       <field type="int16_t" name="vy" units="cm/s">Ground Y Speed (Longitude, positive east)</field>
       <field type="int16_t" name="vz" units="cm/s">Ground Z Speed (Altitude, positive down)</field>
@@ -5738,10 +5870,10 @@
       <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot). The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.</field>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
-      <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11</field>
+      <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL = 0, MAV_FRAME_GLOBAL_RELATIVE_ALT = 3, MAV_FRAME_GLOBAL_TERRAIN_ALT = 10 (MAV_FRAME_GLOBAL_INT, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT are allowed synonyms, but have been deprecated)</field>
       <field type="uint16_t" name="type_mask" enum="POSITION_TARGET_TYPEMASK" display="bitmask">Bitmap to indicate which dimensions should be ignored by the vehicle.</field>
-      <field type="int32_t" name="lat_int" units="degE7">X Position in WGS84 frame</field>
-      <field type="int32_t" name="lon_int" units="degE7">Y Position in WGS84 frame</field>
+      <field type="int32_t" name="lat_int" units="degE7">Latitude in WGS84 frame</field>
+      <field type="int32_t" name="lon_int" units="degE7">Longitude in WGS84 frame</field>
       <field type="float" name="alt" units="m">Altitude (MSL, Relative to home, or AGL - depending on frame)</field>
       <field type="float" name="vx" units="m/s">X velocity in NED frame</field>
       <field type="float" name="vy" units="m/s">Y velocity in NED frame</field>
@@ -5755,10 +5887,10 @@
     <message id="87" name="POSITION_TARGET_GLOBAL_INT">
       <description>Reports the current commanded vehicle position, velocity, and acceleration as specified by the autopilot. This should match the commands sent in SET_POSITION_TARGET_GLOBAL_INT if the vehicle is being controlled this way.</description>
       <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot). The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.</field>
-      <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11</field>
+      <field type="uint8_t" name="coordinate_frame" enum="MAV_FRAME">Valid options are: MAV_FRAME_GLOBAL = 0, MAV_FRAME_GLOBAL_RELATIVE_ALT = 3, MAV_FRAME_GLOBAL_TERRAIN_ALT = 10 (MAV_FRAME_GLOBAL_INT, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT are allowed synonyms, but have been deprecated)</field>
       <field type="uint16_t" name="type_mask" enum="POSITION_TARGET_TYPEMASK" display="bitmask">Bitmap to indicate which dimensions should be ignored by the vehicle.</field>
-      <field type="int32_t" name="lat_int" units="degE7">X Position in WGS84 frame</field>
-      <field type="int32_t" name="lon_int" units="degE7">Y Position in WGS84 frame</field>
+      <field type="int32_t" name="lat_int" units="degE7">Latitude in WGS84 frame</field>
+      <field type="int32_t" name="lon_int" units="degE7">Longitude in WGS84 frame</field>
       <field type="float" name="alt" units="m">Altitude (MSL, AGL or relative to home altitude, depending on frame)</field>
       <field type="float" name="vx" units="m/s">X velocity in NED frame</field>
       <field type="float" name="vy" units="m/s">Y velocity in NED frame</field>
@@ -5960,9 +6092,9 @@
       <field type="float" name="q2">True attitude quaternion component 2, x (0 in null-rotation)</field>
       <field type="float" name="q3">True attitude quaternion component 3, y (0 in null-rotation)</field>
       <field type="float" name="q4">True attitude quaternion component 4, z (0 in null-rotation)</field>
-      <field type="float" name="roll">Attitude roll expressed as Euler angles, not recommended except for human-readable outputs</field>
-      <field type="float" name="pitch">Attitude pitch expressed as Euler angles, not recommended except for human-readable outputs</field>
-      <field type="float" name="yaw">Attitude yaw expressed as Euler angles, not recommended except for human-readable outputs</field>
+      <field type="float" name="roll" units="rad">Attitude roll expressed as Euler angles, not recommended except for human-readable outputs</field>
+      <field type="float" name="pitch" units="rad">Attitude pitch expressed as Euler angles, not recommended except for human-readable outputs</field>
+      <field type="float" name="yaw" units="rad">Attitude yaw expressed as Euler angles, not recommended except for human-readable outputs</field>
       <field type="float" name="xacc" units="m/s/s">X acceleration</field>
       <field type="float" name="yacc" units="m/s/s">Y acceleration</field>
       <field type="float" name="zacc" units="m/s/s">Z acceleration</field>
@@ -6028,8 +6160,8 @@
       <field type="int32_t" name="lat" units="degE7">Latitude (WGS84)</field>
       <field type="int32_t" name="lon" units="degE7">Longitude (WGS84)</field>
       <field type="int32_t" name="alt" units="mm">Altitude (MSL). Positive for up.</field>
-      <field type="uint16_t" name="eph" invalid="UINT16_MAX">GPS HDOP horizontal dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
-      <field type="uint16_t" name="epv" invalid="UINT16_MAX">GPS VDOP vertical dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
+      <field type="uint16_t" name="eph" invalid="UINT16_MAX" multiplier="1E-2">GPS HDOP horizontal dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
+      <field type="uint16_t" name="epv" invalid="UINT16_MAX" multiplier="1E-2">GPS VDOP vertical dilution of position (unitless * 100). If unknown, set to: UINT16_MAX</field>
       <field type="uint16_t" name="vel" units="cm/s" invalid="UINT16_MAX">GPS ground speed. If unknown, set to: UINT16_MAX</field>
       <field type="int16_t" name="vn" units="cm/s">GPS velocity in north direction in earth-fixed NED frame</field>
       <field type="int16_t" name="ve" units="cm/s">GPS velocity in east direction in earth-fixed NED frame</field>
@@ -6380,7 +6512,7 @@
       <field type="float" name="yaw_rate" units="rad/s">Angular rate in yaw axis</field>
     </message>
     <message id="147" name="BATTERY_STATUS">
-      <description>Battery information. Updates GCS with flight controller battery status. Smart batteries also use this message, but may additionally send SMART_BATTERY_INFO.</description>
+      <description>Battery information. Updates GCS with flight controller battery status. Smart batteries also use this message, but may additionally send BATTERY_INFO.</description>
       <field type="uint8_t" name="id" instance="true">Battery ID</field>
       <field type="uint8_t" name="battery_function" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
       <field type="uint8_t" name="type" enum="MAV_BATTERY_TYPE">Type (chemistry) of the battery</field>
@@ -6692,7 +6824,7 @@
       <field type="uint8_t" name="emitter_type" enum="ADSB_EMITTER_TYPE">ADSB emitter type.</field>
       <field type="uint8_t" name="tslc" units="s">Time since last communication in seconds</field>
       <field type="uint16_t" name="flags" enum="ADSB_FLAGS" display="bitmask">Bitmap to indicate various statuses including valid data fields</field>
-      <field type="uint16_t" name="squawk">Squawk code</field>
+      <field type="uint16_t" name="squawk">Squawk code. Note that the code is in decimal: e.g. 7700 (general emergency) is encoded as binary 0b0001_1110_0001_0100, not(!) as 0b0000_111_111_000_000</field>
     </message>
     <message id="247" name="COLLISION">
       <description>Information about a potential collision</description>
@@ -6793,6 +6925,7 @@
       <field type="char[140]" name="cam_definition_uri">Camera definition URI (if any, otherwise only basic functions will be available). HTTP- (http://) and MAVLink FTP- (mavlinkftp://) formatted URIs are allowed (and both must be supported by any GCS that implements the Camera Protocol). The definition file may be xz compressed, which will be indicated by the file extension .xml.xz (a GCS that implements the protocol must support decompressing the file). The string needs to be zero terminated.  Use a zero-length string if not known.</field>
       <extensions/>
       <field type="uint8_t" name="gimbal_device_id" invalid="0">Gimbal id of a gimbal associated with this camera. This is the component id of the gimbal device, or 1-6 for non mavlink gimbals. Use 0 if no gimbal is associated with the camera.</field>
+      <field type="uint8_t" name="camera_device_id" invalid="0">Camera id of a camera associated with this component. This is the component id of a proxied MAVLink camera, or 1-6 for a non-MAVLink camera attached to the component. Use 0 if the component is a camera (not something else providing access to a camera).</field>
     </message>
     <message id="260" name="CAMERA_SETTINGS">
       <description>Settings of a camera. Can be requested with a MAV_CMD_REQUEST_MESSAGE command.</description>
@@ -6853,13 +6986,18 @@
       <field type="char[205]" name="file_url">URL of image taken. Either local storage or http://foo.jpg if camera provides an HTTP interface.</field>
     </message>
     <message id="264" name="FLIGHT_INFORMATION">
-      <description>Information about flight since last arming.
+      <description>Flight information.
+        This includes time since boot for arm, takeoff, and land, and a flight number.
+        Takeoff and landing values reset to zero on arm.
         This can be requested using MAV_CMD_REQUEST_MESSAGE.
+        Note, some fields are misnamed - timestamps are from boot (not UTC) and the flight_uuid is a sequence number.
       </description>
       <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot).</field>
-      <field type="uint64_t" name="arming_time_utc" units="us" invalid="0">Timestamp at arming (time since UNIX epoch) in UTC, 0 for unknown</field>
-      <field type="uint64_t" name="takeoff_time_utc" units="us" invalid="0">Timestamp at takeoff (time since UNIX epoch) in UTC, 0 for unknown</field>
-      <field type="uint64_t" name="flight_uuid">Universally unique identifier (UUID) of flight, should correspond to name of log files</field>
+      <field type="uint64_t" name="arming_time_utc" units="us" invalid="0">Timestamp at arming (since system boot). Set to 0 on boot. Set value on arming. Note, field is misnamed UTC.</field>
+      <field type="uint64_t" name="takeoff_time_utc" units="us" invalid="0">Timestamp at takeoff (since system boot). Set to 0 at boot and on arming. Note, field is misnamed UTC.</field>
+      <field type="uint64_t" name="flight_uuid" invalid="0">Flight number. Note, field is misnamed UUID.</field>
+      <extensions/>
+      <field type="uint32_t" name="landing_time" units="ms" invalid="0">Timestamp at landing (in ms since system boot). Set to 0 at boot and on arming.</field>
     </message>
     <message id="265" name="MOUNT_ORIENTATION">
       <deprecated since="2020-01" replaced_by="MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW">This message is being superseded by MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW. The message can still be used to communicate with legacy gimbals implementing it.</deprecated>
@@ -6909,6 +7047,8 @@
       <field type="uint16_t" name="hfov" units="deg">Horizontal Field of view.</field>
       <field type="char[32]" name="name">Stream name.</field>
       <field type="char[160]" name="uri">Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).</field>
+      <extensions/>
+      <field type="uint8_t" name="encoding" enum="VIDEO_STREAM_ENCODING">Encoding of stream.</field>
     </message>
     <message id="270" name="VIDEO_STREAM_STATUS">
       <description>Information about the status of a video stream. It may be requested using MAV_CMD_REQUEST_MESSAGE.</description>
@@ -7358,26 +7498,33 @@
       <field type="int32_t" name="y">Y coordinate of center point.  Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.</field>
       <field type="float" name="z" units="m">Altitude of center point. Coordinate system depends on frame field.</field>
     </message>
-    <message id="370" name="SMART_BATTERY_INFO">
-      <description>Smart Battery information (static/infrequent update). Use for updates from: smart battery to flight stack, flight stack to GCS. Use BATTERY_STATUS for smart battery frequent updates.</description>
+    <message id="370" name="BATTERY_INFO">
+      <wip/>
+      <description>
+        Battery information that is static, or requires infrequent update.
+        This message should requested using MAV_CMD_REQUEST_MESSAGE and/or streamed at very low rate.
+        BATTERY_STATUS_V2 is used for higher-rate battery status information.
+      </description>
       <field type="uint8_t" name="id" instance="true">Battery ID</field>
-      <field type="uint8_t" name="battery_function" enum="MAV_BATTERY_FUNCTION">Function of the battery</field>
-      <field type="uint8_t" name="type" enum="MAV_BATTERY_TYPE">Type (chemistry) of the battery</field>
-      <field type="int32_t" name="capacity_full_specification" units="mAh" invalid="-1">Capacity when full according to manufacturer, -1: field not provided.</field>
-      <field type="int32_t" name="capacity_full" units="mAh" invalid="-1">Capacity when full (accounting for battery degradation), -1: field not provided.</field>
-      <field type="uint16_t" name="cycle_count" invalid="UINT16_MAX">Charge/discharge cycle count. UINT16_MAX: field not provided.</field>
-      <field type="char[16]" name="serial_number" invalid="[0]">Serial number in ASCII characters, 0 terminated. All 0: field not provided.</field>
-      <field type="char[50]" name="device_name" invalid="[0]">Static device name in ASCII characters, 0 terminated. All 0: field not provided. Encode as manufacturer name then product name separated using an underscore.</field>
-      <field type="uint16_t" name="weight" units="g" invalid="0">Battery weight. 0: field not provided.</field>
-      <field type="uint16_t" name="discharge_minimum_voltage" units="mV" invalid="UINT16_MAX">Minimum per-cell voltage when discharging. If not supplied set to UINT16_MAX value.</field>
-      <field type="uint16_t" name="charging_minimum_voltage" units="mV" invalid="UINT16_MAX">Minimum per-cell voltage when charging. If not supplied set to UINT16_MAX value.</field>
-      <field type="uint16_t" name="resting_minimum_voltage" units="mV" invalid="UINT16_MAX">Minimum per-cell voltage when resting. If not supplied set to UINT16_MAX value.</field>
-      <extensions/>
-      <field type="uint16_t" name="charging_maximum_voltage" units="mV" invalid="0">Maximum per-cell voltage when charged. 0: field not provided.</field>
+      <field type="uint8_t" name="battery_function" enum="MAV_BATTERY_FUNCTION">Function of the battery.</field>
+      <field type="uint8_t" name="type" enum="MAV_BATTERY_TYPE">Type (chemistry) of the battery.</field>
+      <field type="uint8_t" name="state_of_health" units="%" invalid="UINT8_MAX">State of Health (SOH) estimate. Typically 100% at the time of manufacture and will decrease over time and use. -1: field not provided.</field>
       <field type="uint8_t" name="cells_in_series" invalid="0">Number of battery cells in series. 0: field not provided.</field>
-      <field type="uint32_t" name="discharge_maximum_current" units="mA" invalid="0">Maximum pack discharge current. 0: field not provided.</field>
-      <field type="uint32_t" name="discharge_maximum_burst_current" units="mA" invalid="0">Maximum pack discharge burst current. 0: field not provided.</field>
-      <field type="char[11]" name="manufacture_date" invalid="[0]">Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.</field>
+      <field type="uint16_t" name="cycle_count" invalid="UINT16_MAX">Lifetime count of the number of charge/discharge cycles (https://en.wikipedia.org/wiki/Charge_cycle). UINT16_MAX: field not provided.</field>
+      <field type="uint16_t" name="weight" units="g" invalid="0">Battery weight. 0: field not provided.</field>
+      <field type="float" name="discharge_minimum_voltage" units="V" invalid="0">Minimum per-cell voltage when discharging. 0: field not provided.</field>
+      <field type="float" name="charging_minimum_voltage" units="V" invalid="0">Minimum per-cell voltage when charging. 0: field not provided.</field>
+      <field type="float" name="resting_minimum_voltage" units="V" invalid="0">Minimum per-cell voltage when resting. 0: field not provided.</field>
+      <field type="float" name="charging_maximum_voltage" units="V" invalid="0">Maximum per-cell voltage when charged. 0: field not provided.</field>
+      <field type="float" name="charging_maximum_current" units="A" invalid="0">Maximum pack continuous charge current. 0: field not provided.</field>
+      <field type="float" name="nominal_voltage" units="V" invalid="0">Battery nominal voltage. Used for conversion between Wh and Ah. 0: field not provided.</field>
+      <field type="float" name="discharge_maximum_current" units="A" invalid="0">Maximum pack discharge current. 0: field not provided.</field>
+      <field type="float" name="discharge_maximum_burst_current" units="A" invalid="0">Maximum pack discharge burst current. 0: field not provided.</field>
+      <field type="float" name="design_capacity" units="Ah" invalid="0">Fully charged design capacity. 0: field not provided.</field>
+      <field type="float" name="full_charge_capacity" units="Ah" invalid="NaN">Predicted battery capacity when fully charged (accounting for battery degradation). NAN: field not provided.</field>
+      <field type="char[9]" name="manufacture_date" invalid="[0]">Manufacture date (DDMMYYYY) in ASCII characters, 0 terminated. All 0: field not provided.</field>
+      <field type="char[32]" name="serial_number" invalid="[0]">Serial number in ASCII characters, 0 terminated. All 0: field not provided.</field>
+      <field type="char[50]" name="name" invalid="[0]">Battery device name. Formatted as manufacturer name then product name, separated with an underscore (in ASCII characters), 0 terminated. All 0: field not provided.</field>
     </message>
     <message id="373" name="GENERATOR_STATUS">
       <description>Telemetry of power generation system. Alternator or mechanical generator.</description>
@@ -7462,6 +7609,17 @@
       <field type="uint32_t" name="peripherals_metadata_file_crc">CRC32 of peripherals metadata file (peripherals_metadata_uri).</field>
       <field type="char[100]" name="peripherals_metadata_uri">(Optional) MAVLink FTP URI for the peripherals metadata file (COMP_METADATA_TYPE_PERIPHERALS), which may be compressed with xz. This contains data about "attached components" such as UAVCAN nodes. The peripherals are in a separate file because the information must be generated dynamically at runtime. The string needs to be zero terminated.</field>
     </message>
+    <message id="396" name="COMPONENT_INFORMATION_BASIC">
+      <description>Basic component information data. Should be requested using MAV_CMD_REQUEST_MESSAGE on startup, or when required.</description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot).</field>
+      <field type="uint64_t" name="capabilities" enum="MAV_PROTOCOL_CAPABILITY" display="bitmask">Component capability flags</field>
+      <field type="uint32_t" name="time_manufacture_s" units="s" invalid="0">Date of manufacture as a UNIX Epoch time (since 1.1.1970) in seconds.</field>
+      <field type="char[32]" name="vendor_name">Name of the component vendor. Needs to be zero terminated. The field is optional and can be empty/all zeros.</field>
+      <field type="char[32]" name="model_name">Name of the component model. Needs to be zero terminated. The field is optional and can be empty/all zeros.</field>
+      <field type="char[24]" name="software_version">Software version. The recommended format is SEMVER: 'major.minor.patch'  (any format may be used). The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
+      <field type="char[24]" name="hardware_version">Hardware version. The recommended format is SEMVER: 'major.minor.patch'  (any format may be used). The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
+      <field type="char[32]" name="serial_number">Hardware serial number. The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
+    </message>
     <message id="397" name="COMPONENT_METADATA">
       <wip/>
       <!-- This message is work-in-progress it can therefore change, and should NOT be used in stable production environments -->
@@ -7532,6 +7690,20 @@
       <field type="uint16_t" name="sequence">Sequence number.</field>
       <field type="uint16_t" name="sequence_oldest_available">Oldest Sequence number that is still available after the sequence set in REQUEST_EVENT.</field>
       <field type="uint8_t" name="reason" enum="MAV_EVENT_ERROR_REASON">Error reason.</field>
+    </message>
+    <message id="440" name="ILLUMINATOR_STATUS">
+      <description>Illuminator status</description>
+      <field type="uint32_t" name="uptime_ms" units="ms">Time since the start-up of the illuminator in ms</field>
+      <field type="uint8_t" name="enable">0: Illuminators OFF, 1: Illuminators ON</field>
+      <field type="uint8_t" name="mode_bitmask" enum="ILLUMINATOR_MODE" display="bitmask">Supported illuminator modes</field>
+      <field type="uint32_t" name="error_status" enum="ILLUMINATOR_ERROR_FLAGS" display="bitmask">Errors</field>
+      <field type="uint8_t" name="mode" enum="ILLUMINATOR_MODE">Illuminator mode</field>
+      <field type="float" name="brightness" units="%">Illuminator brightness</field>
+      <field type="float" name="strobe_period" units="s">Illuminator strobing period in seconds</field>
+      <field type="float" name="strobe_duty_cycle" units="%">Illuminator strobing duty cycle</field>
+      <field type="float" name="temp_c">Temperature in Celsius</field>
+      <field type="float" name="min_strobe_period" units="s">Minimum strobing period in seconds</field>
+      <field type="float" name="max_strobe_period" units="s">Maximum strobing period in seconds</field>
     </message>
     <!-- The message ids 510 and 511 are reserved for ABSOLUTE_TARGET and RELATIVE_TARGET, currently in development.xml. -->
     <message id="387" name="CANFD_FRAME">
